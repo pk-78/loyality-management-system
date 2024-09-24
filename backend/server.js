@@ -2,6 +2,7 @@
 import express from "express";
 import connectDB from "./db/db.js";
 import dotenv from "dotenv"
+import cors from "cors"
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -15,7 +16,7 @@ app.use(express.json());
 app.use(cors());
 
 app.get("/",(req,res)=>{
-    console.log("hello")
+    return res.send("hello")
 })
 
 
