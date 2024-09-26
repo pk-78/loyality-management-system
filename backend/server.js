@@ -1,10 +1,10 @@
 
+import cors from "cors";
+import dotenv from "dotenv";
 import express from "express";
 import connectDB from "./db/db.js";
-import dotenv from "dotenv"
-import cors from "cors"
-import userRouter from "./routes/user.rouets.js";
 import patientRouter from "./routes/patient.route.js";
+import userRouter from "./routes/user.rouets.js";
 
 const app = express();
 const port = process.env.PORT || 5000;
