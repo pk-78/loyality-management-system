@@ -8,10 +8,10 @@ const userRouter = express.Router()
 
 userRouter.post('/register',registerUser)
 userRouter.post('/login', loginUser);
-userRouter.get('/users', getAllUsers);
+userRouter.get('/getAllUsers', getAllUsers);
 userRouter.post('/verifyToken', verifyToken);
-userRouter.put('/users', verifyToken, editUser); 
-userRouter.delete('/users', verifyToken, deleteUser);
+userRouter.patch("/users/:userId", editUser);
+userRouter.delete('/users/:userId', deleteUser);
 
 
 
