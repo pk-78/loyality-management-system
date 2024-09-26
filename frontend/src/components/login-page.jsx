@@ -14,6 +14,7 @@ import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { url } from "../services/Url";
+import axiosInstance from "../services/axiosConfig";
 
 const LoginPage = () => {
   const {
@@ -25,18 +26,41 @@ const LoginPage = () => {
   const [loginError, setLoginError] = useState(""); // Custom error for login
   const navigate = useNavigate();
 
-  function OnSubmit(data) {
-    setLoginError(""); // Clear any previous login errors
-    console.log(data)
-    
+  const OnSubmit = async (data) => {
+    console.log(data);
+    try {
+      setLoginError(""); // Clear any previous login errors
 
-    if (data.userId === "admin" && data.password === "12345678") {
-      toast.success("Login Successful");
-      navigate("/patient-search");
-    } else {
-      setLoginError("Invalid User ID or password");
+      // Send login request to backend
+      const response = await axiosInstance.post(
+        "http://localhost:5000/api/v1/user/login",
+        {
+          userId: data.userId,
+          password: data.password,
+        }
+      );
+      console.log(response);
+      // Handle success
+      if (response.status === 200) {
+        toast.success("Login Successful");
+        // Store token and user data if needed
+        // localStorage.setItem("token", response.data.token);
+        // localStorage.setItem("user", JSON.stringify(response.data.user));
+
+        // Navigate to another page (e.g., /patient-search)
+        navigate("/patient-search");
+      }
+    } catch (error) {
+      // Handle errors
+      if (error.response && error.response.status === 401) {
+        setLoginError("Invalid User ID or password");
+      } else if (error.response && error.response.status === 404) {
+        setLoginError("User not found");
+      } else {
+        setLoginError("An unexpected error occurred");
+      }
     }
-  }
+  };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">

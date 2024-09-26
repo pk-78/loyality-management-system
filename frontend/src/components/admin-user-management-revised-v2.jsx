@@ -78,10 +78,20 @@ const AdminUserManagement = () => {
     setIsAddDialogOpen(false);
   };
 
-  const handleEditUser = () => {
+  const handleEditUser = (data) => {
     setUsers(
       users.map((user) => (user.id === editingUser.id ? editingUser : user))
     );
+    // axiosInstance
+    //   .put(`${url}/user/register`, data)
+    //   .then((response) => {
+    //     console.log("Success:", response.data);
+    //     toast.success("User changed Successfully");
+    //     setIsAddDialogOpen(false);
+    //   })
+    //   .catch((error) => {
+    //     console.error("Error:", error);
+    //   });
     setIsEditDialogOpen(false);
   };
 

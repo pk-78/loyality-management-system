@@ -5,6 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Search, UserPlus } from "lucide-react";
 import { useForm } from "react-hook-form";
+import axiosInstance from "../services/axiosConfig";
+import { url } from "../services/Url";
+import toast from "react-hot-toast";
 
 const PatientSearchAndManagement = () => {
   const [showNewPatientForm, setShowNewPatientForm] = useState(false);
@@ -13,7 +16,7 @@ const PatientSearchAndManagement = () => {
     register,
     handleSubmit,
     // formState: { errors },,
-    reset
+    reset,
   } = useForm();
 
   // Mock search function
@@ -24,9 +27,46 @@ const PatientSearchAndManagement = () => {
       { uhid: "67890", name: "Jane Smith", points: 750 },
     ]);
   };
-  function OnSubmit(data) {
+  // function OnSubmit(data) {
+  //   console.log(data);
+  //   axiosInstance
+  //     .post(`${url}/patient/register`, data)
+  //     .then((response) => {
+  //       console.log(response);
+  //       console.log("Success:", response.data);
+  //       toast.success("User Added Successfully");
+  //       setIsAddDialogOpen(false);
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error:", error);
+  //     });
+  //   reset();
+  // }
+
+  async function OnSubmit(data) {
     console.log(data);
-    reset ();
+    try {
+      // Send login request to backend
+      const response = await axiosInstance.post(
+        `${url}/patient/register`,
+        data
+      );
+      console.log(response);
+      // Handle success
+      if (response.status === 201) {
+        toast.success("Patient Added Successfully");
+        // Store token and user data if needed
+        // localStorage.setItem("token", response.data.token);
+        // localStorage.setItem("user", JSON.stringify(response.data.user));
+      }
+    } catch (error) {
+      // Handle errors
+      if (error.response && error.response.status === 400) {
+        toast.error("Id already Exist");
+      } else {
+        setLoginError("An unexpected error occurred");
+      }
+    }
   }
 
   return (
@@ -91,7 +131,7 @@ const PatientSearchAndManagement = () => {
                 <Input
                   id="uhid"
                   placeholder="Enter Unique Health ID"
-                  {...register("uhiD", { required: "This field is required" })}
+                  {...register("UHID", { required: "This field is required" })}
                 />
               </div>
               <div className="space-y-2">
@@ -99,7 +139,7 @@ const PatientSearchAndManagement = () => {
                 <Input
                   id="LCN"
                   placeholder="Enter Loyality Card Number"
-                  {...register("loyalityCard", {
+                  {...register("LoyalityCard", {
                     required: "This field is required",
                   })}
                 />
@@ -119,7 +159,7 @@ const PatientSearchAndManagement = () => {
                   id="initial-points"
                   type="number"
                   placeholder="Enter initial points"
-                  {...register("initialPoints", {
+                  {...register("CurrentPoints", {
                     required: "This field is required",
                   })}
                 />
