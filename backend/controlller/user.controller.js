@@ -117,3 +117,54 @@ export const verifyToken =(res,req,next)=>{
 
 
 }
+
+
+
+
+export const editUser = async (req, res) => {
+    try {
+        const { userId, name, role, password } = req.body; 
+
+        const user = await User.findOne({ userId });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        if (name) user.name = name;
+        if (role) user.role = role;
+
+        if (password) {
+            user.password = await bcrypt.hash(password, 10);
+        }
+
+        await user.save();
+
+        return res.status(200).json({
+            message: 'User updated successfully',
+            user: { userId: user.userId, name: user.name, role: user.role },
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+
+
+
+export const deleteUser = async (req, res) => {
+    try {
+        const { userId } = req.body; 
+
+        const user = await User.findOneAndDelete({ userId });
+        
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        return res.status(200).json({ message: 'User deleted successfully' });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+};
