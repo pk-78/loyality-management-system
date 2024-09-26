@@ -20,6 +20,10 @@ import {
 import { User, Edit, Trash2, UserPlus } from "lucide-react";
 import { useForm } from "react-hook-form";
 
+import axiosInstance from "../services/axiosConfig";
+import toast from "react-hot-toast";
+import { url } from "../services/Url";
+
 const AdminUserManagement = () => {
   const [users, setUsers] = useState([
     { id: "USR001", name: "John Doe", password: "********", role: "Admin" },
@@ -54,7 +58,18 @@ const AdminUserManagement = () => {
   }
 
   function OnSubmit(data) {
-    console.log(data);
+    console.log(data); // This will log the form data
+
+    axiosInstance
+      .post(`${url}/user/register`, data)
+      .then((response) => {
+        console.log("Success:", response.data);
+        toast.success("User Added Successfully");
+        setIsAddDialogOpen(false);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
   }
 
   const handleAddUser = () => {
@@ -168,8 +183,8 @@ const AdminUserManagement = () => {
                       })}
                     >
                       <option value="">Select Role</option>
-                      <option value="admin">Admin</option>
-                      <option value="staff">Staff</option>
+                      <option value="Admin">Admin</option>
+                      <option value="Staff">Staff</option>
                     </select>
                   </div>
                 </div>
