@@ -10,7 +10,7 @@ export const verifyToken = (req, res) => {
   try {
     const decoded = jwt.verify(
       token,
-      process.env.JWT_SECRET || "default_secret"
+      process.env.SECRET_KEY || "default_secret"
     );
     req.user = decoded
     return res.status(200).json({ success: true, decoded });
