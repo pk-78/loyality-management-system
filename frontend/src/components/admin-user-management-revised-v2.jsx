@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,11 +25,7 @@ import toast from "react-hot-toast";
 import { url } from "../services/Url";
 
 const AdminUserManagement = () => {
-  const [users, setUsers] = useState([
-    { id: "USR001", name: "John Doe", password: "********", role: "Admin" },
-    { id: "USR002", name: "Jane Smith", password: "********", role: "Staff" },
-    { id: "USR003", name: "Bob Johnson", password: "********", role: "Staff" },
-  ]);
+  const [users, setUsers] = useState([]); // Set an empty array initially
 
   const [newUser, setNewUser] = useState({
     id: "",
@@ -47,16 +43,32 @@ const AdminUserManagement = () => {
     handleSubmit,
     formState: { errors },
   } = useForm();
-  function optionHandler(event) {
-    // const value = e.target.value === "" ? null : e.target.value;
-    // console.log(value); // Logs null initially, or the selected value
-    const { value } = event.target;
-    value === "" ? null : event.target;
-    console.log(value); // Logs null initially, or the selected value
 
-    setSelectedType(value);
-  }
+  // Fetch users when the component mounts
+  useEffect(() => {
+    async function fetchUsers() {
+      try {
+        const response = await fetch(`${url}/user/getAllUsers`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
 
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+
+        const getData = await response.json();
+        setUsers(getData.users);
+        console.log("Users data:", getData.users);
+      } catch (error) {
+        console.error("Error fetching users:", error); // Handle any errors
+      }
+    }
+
+    fetchUsers();
+  }, []);
   function OnSubmit(data) {
     console.log(data); // This will log the form data
 
@@ -66,28 +78,63 @@ const AdminUserManagement = () => {
         console.log("Success:", response.data);
         toast.success("User Added Successfully");
         setIsAddDialogOpen(false);
+        setUsers([...users, response.data.user]); // Add new user to state
       })
       .catch((error) => {
         console.error("Error:", error);
       });
   }
 
-  const handleAddUser = () => {
-    setUsers([...users, { ...newUser }]);
-    setNewUser({ id: "", name: "", password: "", role: "" });
-    setIsAddDialogOpen(false);
+  const handleEditUser = async (userId) => {
+    console.log("ye le", editingUser.userId);
+    console.log("ye le name", editingUser.name);
+    console.log("ye le password", editingUser.password);
+    console.log("ye le role", editingUser.role);
+    try {
+      const response = await axiosInstance.patch(
+        `${url}/user/users/${editingUser.userId}`, // The PATCH request URL
+        {
+          userId: editingUser.userId,
+          name: editingUser.name,
+          password: editingUser.password,
+          role: editingUser.role,
+        }
+      );
+
+      console.log("Success:", response.data);
+      toast.success("User updated successfully");
+
+      // Update the local state with the updated user data
+      setUsers(
+        users.map((user) =>
+          user.userId === editingUser.userId ? response.data.user : user
+        )
+      );
+      setIsEditDialogOpen(false); // Close the edit dialog
+    } catch (error) {
+      console.error("Error updating user:", error);
+      toast.error("Failed to update user");
+    }
+    setEditingUser(false);
   };
 
-  const handleEditUser = () => {
-    setUsers(
-      users.map((user) => (user.id === editingUser.id ? editingUser : user))
-    );
-    setIsEditDialogOpen(false);
-  };
+  async function handleDeleteUser(userId) {
+    console.log("delete krna h", userId);
+    try {
+      const response = await axiosInstance.delete(
+        `${url}/user/users/${userId}`
+      );
+      console.log(response.data); // Success message or response from the server
+      toast.success("User deleted Succesfully");
+    } catch (error) {
+      console.error(
+        "Error deleting user:",
+        error.response ? error.response.data : error.message
+      );
+    }
 
-  const handleDeleteUser = (id) => {
-    setUsers(users.filter((user) => user.id !== id));
-  };
+    setUsers(users.filter((user) => user.userId !== userId)); // Remove the user from the list
+  }
 
   return (
     <div className="p-4">
@@ -151,42 +198,21 @@ const AdminUserManagement = () => {
                   )}
                 </div>
 
-                <div>
-                  {/* <Label htmlFor="role">Role</Label> */}
-                  {/* <Select
+                <div className="flex flex-col">
+                  <Label htmlFor="role" className="mb-4">
+                    Role
+                  </Label>
+                  <select
+                    id="role"
+                    name="role"
                     {...register("role", {
-                      required: "This field is required",
+                      required: "Role is required",
                     })}
                   >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select role" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Admin">Admin</SelectItem>
-                      <SelectItem value="Staff">Staff</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  {errors.role && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {errors.role?.message}
-                    </p>
-                  )} */}
-
-                  <div className="flex flex-col">
-                    <label for="role">Role</label>
-                    <select
-                      id="role"
-                      name="role"
-                      onChange={optionHandler}
-                      {...register("role", {
-                        required: "Answer type is required",
-                      })}
-                    >
-                      <option value="">Select Role</option>
-                      <option value="Admin">Admin</option>
-                      <option value="Staff">Staff</option>
-                    </select>
-                  </div>
+                    <option value="">Select Role</option>
+                    <option value="Admin">Admin</option>
+                    <option value="Staff">Staff</option>
+                  </select>
                 </div>
 
                 <Button type="submit">Add User</Button>
@@ -208,7 +234,7 @@ const AdminUserManagement = () => {
                 key={user.id}
                 className="grid grid-cols-5 gap-4 p-2 border-b"
               >
-                <div>{user.id}</div>
+                <div>{user.userId}</div>
                 <div>{user.name}</div>
                 <div>{user.password}</div>
                 <div>{user.role}</div>
@@ -236,7 +262,8 @@ const AdminUserManagement = () => {
                             <Label htmlFor="edit-id">User ID</Label>
                             <Input
                               id="edit-id"
-                              value={editingUser.id}
+                              value={editingUser.userId}
+                              disable="true"
                               onChange={(e) =>
                                 setEditingUser({
                                   ...editingUser,
@@ -298,7 +325,7 @@ const AdminUserManagement = () => {
                     variant="outline"
                     size="sm"
                     className="ml-2"
-                    onClick={() => handleDeleteUser(user.id)}
+                    onClick={() => handleDeleteUser(user.userId)}
                   >
                     <Trash2 className="h-4 w-4 mr-1" /> Delete
                   </Button>

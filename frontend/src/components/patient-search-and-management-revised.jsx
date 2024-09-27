@@ -1,36 +1,104 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Search, UserPlus } from "lucide-react";
+import { Search, UserPlus, Trash2, Edit } from "lucide-react";
 import { useForm } from "react-hook-form";
+import axiosInstance from "../services/axiosConfig";
+import { url } from "../services/Url";
+import toast from "react-hot-toast";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { useNavigate } from "react-router-dom";
 
 const PatientSearchAndManagement = () => {
   const [showNewPatientForm, setShowNewPatientForm] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
-  const {
-    register,
-    handleSubmit,
-    // formState: { errors },,
-    reset
-  } = useForm();
+  const [insideQuerry, setInsideQuerry] = useState("");
+
+  const { register, handleSubmit, reset } = useForm();
+
+  const [patients, setPatients] = useState([]);
+  const navigate = useNavigate();
 
   // Mock search function
+
   const handleSearch = (query) => {
-    // In a real app, this would call an API
-    setSearchResults([
-      { uhid: "12345", name: "John Doe", points: 500 },
-      { uhid: "67890", name: "Jane Smith", points: 750 },
-    ]);
+    console.log(query);
+    setInsideQuerry(query);
+    console.log("andr dekh", insideQuerry);
+
+    // Filter patients based on the query
+    const filteredResults = patients.filter(
+      (patient) =>
+        patient.UHID.includes(query) ||
+        patient.name.toLowerCase().includes(query.toLowerCase())
+    );
+
+    // Set the filtered results
+    setSearchResults(filteredResults);
   };
-  function OnSubmit(data) {
-    console.log(data);
-    reset ();
+
+  useEffect(() => {
+    async function fetchUsers() {
+      try {
+        const response = await fetch(`${url}/patient/getAllPatients`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+
+        const getData = await response.json(); // Convert the response to JSON
+
+        console.log("patient data:", getData.patients);
+        setPatients(getData.patients);
+        // Log the users data
+      } catch (error) {
+        console.error("Error fetching users:", error); // Handle any errors
+      }
+    }
+
+    fetchUsers(); // Fetch users on component mount
+  }, []);
+
+  // Submit function to handle new patient registration
+  async function OnSubmit(data) {
+    try {
+      const response = await axiosInstance.post(
+        `${url}/patient/register`,
+        data
+      );
+      console.log(data);
+      if (response.status === 201) {
+        toast.success("Patient Added Successfully");
+        setPatients([...patients, response.data.patient]);
+        reset();
+        setShowNewPatientForm(false);
+      }
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        toast.error("ID already exists");
+      } else {
+        toast.error("An unexpected error occurred");
+      }
+    }
   }
 
   return (
     <div className="p-4">
+      {/* Patient Search Section */}
       <Card className="mb-4">
         <CardHeader>
           <CardTitle>Patient Search</CardTitle>
@@ -52,33 +120,6 @@ const PatientSearchAndManagement = () => {
         </CardContent>
       </Card>
 
-      {searchResults.length > 0 && (
-        <Card className="mb-4">
-          <CardHeader>
-            <CardTitle>Search Results</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {searchResults.map((patient) => (
-                <div
-                  key={patient.uhid}
-                  className="flex items-center justify-between p-2 border rounded"
-                >
-                  <div>
-                    <p className="font-bold">{patient.name}</p>
-                    <p className="text-sm text-gray-500">
-                      UHID: {patient.uhid}
-                    </p>
-                    <p className="text-sm">Points: {patient.points}</p>
-                  </div>
-                  <Button variant="outline">Manage Points</Button>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
       {showNewPatientForm && (
         <Card>
           <CardHeader>
@@ -91,20 +132,19 @@ const PatientSearchAndManagement = () => {
                 <Input
                   id="uhid"
                   placeholder="Enter Unique Health ID"
-                  {...register("uhiD", { required: "This field is required" })}
+                  {...register("UHID", { required: "This field is required" })}
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="LCN">Loyalty Card Number</Label>
                 <Input
                   id="LCN"
-                  placeholder="Enter Loyality Card Number"
-                  {...register("loyalityCard", {
+                  placeholder="Enter Loyalty Card Number"
+                  {...register("LoyalityCard", {
                     required: "This field is required",
                   })}
                 />
               </div>
-
               <div className="space-y-2">
                 <Label htmlFor="name">Full Name</Label>
                 <Input
@@ -119,7 +159,7 @@ const PatientSearchAndManagement = () => {
                   id="initial-points"
                   type="number"
                   placeholder="Enter initial points"
-                  {...register("initialPoints", {
+                  {...register("currentPoints", {
                     required: "This field is required",
                   })}
                 />
@@ -129,6 +169,71 @@ const PatientSearchAndManagement = () => {
           </CardContent>
         </Card>
       )}
+
+      {/* User Management Table */}
+      {insideQuerry === "" && (
+        <CardContent>
+          <div className="overflow-x-auto">
+            <div className="grid grid-cols-4 gap-4 font-bold mb-2 p-2 bg-gray-100">
+              <div>UHID</div>
+              <div>Loyality Card Number</div>
+              <div>Name</div>
+              <div>Points</div>
+            </div>
+            <div>
+              {patients.map((user) => (
+                <div
+                  key={user.id} // Use user.id as the key
+                  className="grid grid-cols-4 gap-4 p-2 border-b"
+                >
+                  <div>{user.UHID}</div>
+                  <div>{user.LoyalityCard}</div>
+                  <div>{user.name}</div>
+                  <div>{user.currentPoints}</div>
+                  <div>
+                    {/* Dialog component wrapping Trigger and Content */}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      )}
+
+      {/* Search Results */}
+      {insideQuerry !== "" && (
+        <Card className="mb-4">
+          <CardHeader>
+            <CardTitle>Search Results</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {searchResults.map((patient) => (
+                <div
+                  key={patient.UHID}
+                  className="flex items-center justify-between p-2 border rounded"
+                >
+                  <div>
+                    <p className="font-bold">{patient.name}</p>
+                    <p className="text-sm text-gray-500">
+                      UHID: {patient.UHID}
+                    </p>
+                    <p className="text-sm">Points: {patient.points}</p>
+                  </div>
+                  <Button
+                    onClick={() => navigate("/patient-point")}
+                    variant="outline"
+                  >
+                    Manage Points
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* New Patient Form */}
     </div>
   );
 };
