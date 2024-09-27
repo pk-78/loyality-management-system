@@ -78,7 +78,7 @@ export const handleTransaction = async (req, res) => {
     const { points, transactionType, desk, remarks } = req.body;
 
     // Find the patient by UHID
-    const patient = await PatientModel.findOne({ UHID });
+    const patient = await Patient.findOne({ UHID });
     if (!patient) {
       return res.status(404).json({ message: 'Patient not found' });
     }
@@ -109,3 +109,18 @@ export const handleTransaction = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+export const  showTransaction = async(req,res)=>{
+try {
+  const {UHID} = req.params
+  const patient = await Patient.findOne({ UHID });
+    if (!patient) {
+      return res.status(400).json({ message: 'Patient not found' });
+    }
+  const transactions = patient.transaction
+  return res.status(200).json({message:"success",transactions})
+} catch (error) {
+  console.log(error.message);
+    res.status(500).json("error in show transaction controller");
+}
+}

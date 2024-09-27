@@ -39,9 +39,10 @@ export const registerUser = async (req, res) => {
 export const loginUser = async (req, res) => {
   try {
     const { userId, password } = req.body;
-
+    console.log(userId, password)
     // Find user by userId
-    const user = await User.findOne({ userId });
+    const user = await User.findOne({ userId:userId });
+    console.log(user)
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
