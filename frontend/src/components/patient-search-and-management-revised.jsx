@@ -28,21 +28,21 @@ const PatientSearchAndManagement = () => {
   const [patients, setPatients] = useState([]);
   const navigate = useNavigate();
 
-  // Mock search function
+  
 
   const handleSearch = (query) => {
     console.log(query);
     setInsideQuerry(query);
     console.log("andr dekh", insideQuerry);
 
-    // Filter patients based on the query
+   
     const filteredResults = patients.filter(
       (patient) =>
         patient.UHID.includes(query) ||
         patient.name.toLowerCase().includes(query.toLowerCase())
     );
 
-    // Set the filtered results
+   
     setSearchResults(filteredResults);
   };
 
@@ -60,20 +60,20 @@ const PatientSearchAndManagement = () => {
           throw new Error("Network response was not ok");
         }
 
-        const getData = await response.json(); // Convert the response to JSON
+        const getData = await response.json(); 
 
         console.log("patient data:", getData.patients);
         setPatients(getData.patients);
-        // Log the users data
+       
       } catch (error) {
-        console.error("Error fetching users:", error); // Handle any errors
+        console.error("Error fetching users:", error); 
       }
     }
 
-    fetchUsers(); // Fetch users on component mount
+    fetchUsers(); 
   }, []);
 
-  // Submit function to handle new patient registration
+  
   async function OnSubmit(data) {
     try {
       const response = await axiosInstance.post(
@@ -98,7 +98,7 @@ const PatientSearchAndManagement = () => {
 
   return (
     <div className="p-4">
-      {/* Patient Search Section */}
+     
       <Card className="mb-4">
         <CardHeader>
           <CardTitle>Patient Search</CardTitle>
@@ -170,7 +170,7 @@ const PatientSearchAndManagement = () => {
         </Card>
       )}
 
-      {/* User Management Table */}
+     
       {insideQuerry === "" && (
         <CardContent>
           <div className="overflow-x-auto">
@@ -183,7 +183,7 @@ const PatientSearchAndManagement = () => {
             <div>
               {patients.map((user) => (
                 <div
-                  key={user.id} // Use user.id as the key
+                  key={user.id}
                   className="grid grid-cols-4 gap-4 p-2 border-b"
                 >
                   <div>{user.UHID}</div>
@@ -191,7 +191,7 @@ const PatientSearchAndManagement = () => {
                   <div>{user.name}</div>
                   <div>{user.currentPoints}</div>
                   <div>
-                    {/* Dialog component wrapping Trigger and Content */}
+                  
                   </div>
                 </div>
               ))}
@@ -218,10 +218,10 @@ const PatientSearchAndManagement = () => {
                     <p className="text-sm text-gray-500">
                       UHID: {patient.UHID}
                     </p>
-                    <p className="text-sm">Points: {patient.points}</p>
+                    <p className="text-sm">Points: {patient.currentPoints}</p>
                   </div>
                   <Button
-                    onClick={() => navigate("/patient-point")}
+                    onClick={() => navigate(`/patient-point/${patient.UHID}`)}
                     variant="outline"
                   >
                     Manage Points
@@ -233,7 +233,7 @@ const PatientSearchAndManagement = () => {
         </Card>
       )}
 
-      {/* New Patient Form */}
+     
     </div>
   );
 };
