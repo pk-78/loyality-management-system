@@ -22,7 +22,7 @@ function App() {
             }
           />
           <Route
-            path="/patient-point"
+            path="/patient-point/:id"
             element={
               // <PrivateRoutes>
               <PatientPointsManagement />
