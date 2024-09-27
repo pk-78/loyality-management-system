@@ -23,13 +23,13 @@ const LoginPage = () => {
     formState: { errors },
   } = useForm();
 
-  const [loginError, setLoginError] = useState(""); // Custom error for login
+  const [loginError, setLoginError] = useState(""); 
   const navigate = useNavigate();
 
   const OnSubmit = async (data) => {
     console.log(data);
     try {
-      setLoginError(""); // Clear any previous login errors
+      setLoginError("");
 
       // Send login request to backend
       const response = await axiosInstance.post(
@@ -40,14 +40,10 @@ const LoginPage = () => {
         }
       );
       console.log(response);
-      // Handle success
+     
       if (response.status === 200) {
         toast.success("Login Successful");
-        // Store token and user data if needed
-        // localStorage.setItem("token", response.data.token);
-        // localStorage.setItem("user", JSON.stringify(response.data.user));
-
-        // Navigate to another page (e.g., /patient-search)
+       
         navigate("/patient-search");
       }
     } catch (error) {

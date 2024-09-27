@@ -25,7 +25,7 @@ import toast from "react-hot-toast";
 import { url } from "../services/Url";
 
 const AdminUserManagement = () => {
-  const [users, setUsers] = useState([]); // Set an empty array initially
+  const [users, setUsers] = useState([]); 
 
   const [newUser, setNewUser] = useState({
     id: "",
@@ -44,7 +44,7 @@ const AdminUserManagement = () => {
     formState: { errors },
   } = useForm();
 
-  // Fetch users when the component mounts
+ 
   useEffect(() => {
     async function fetchUsers() {
       try {
@@ -63,14 +63,14 @@ const AdminUserManagement = () => {
         setUsers(getData.users);
         console.log("Users data:", getData.users);
       } catch (error) {
-        console.error("Error fetching users:", error); // Handle any errors
+        console.error("Error fetching users:", error); 
       }
     }
 
     fetchUsers();
   }, []);
   function OnSubmit(data) {
-    console.log(data); // This will log the form data
+    console.log(data); 
 
     axiosInstance
       .post(`${url}/user/register`, data)
@@ -78,7 +78,7 @@ const AdminUserManagement = () => {
         console.log("Success:", response.data);
         toast.success("User Added Successfully");
         setIsAddDialogOpen(false);
-        setUsers([...users, response.data.user]); // Add new user to state
+        setUsers([...users, response.data.user]); 
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -92,7 +92,7 @@ const AdminUserManagement = () => {
     console.log("ye le role", editingUser.role);
     try {
       const response = await axiosInstance.patch(
-        `${url}/user/users/${editingUser.userId}`, // The PATCH request URL
+        `${url}/user/users/${editingUser.userId}`,
         {
           userId: editingUser.userId,
           name: editingUser.name,
@@ -104,13 +104,13 @@ const AdminUserManagement = () => {
       console.log("Success:", response.data);
       toast.success("User updated successfully");
 
-      // Update the local state with the updated user data
+      
       setUsers(
         users.map((user) =>
           user.userId === editingUser.userId ? response.data.user : user
         )
       );
-      setIsEditDialogOpen(false); // Close the edit dialog
+      setIsEditDialogOpen(false); 
     } catch (error) {
       console.error("Error updating user:", error);
       toast.error("Failed to update user");
@@ -124,7 +124,7 @@ const AdminUserManagement = () => {
       const response = await axiosInstance.delete(
         `${url}/user/users/${userId}`
       );
-      console.log(response.data); // Success message or response from the server
+      console.log(response.data); 
       toast.success("User deleted Succesfully");
     } catch (error) {
       console.error(
@@ -133,7 +133,7 @@ const AdminUserManagement = () => {
       );
     }
 
-    setUsers(users.filter((user) => user.userId !== userId)); // Remove the user from the list
+    setUsers(users.filter((user) => user.userId !== userId)); 
   }
 
   return (
