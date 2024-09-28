@@ -17,15 +17,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { User, Edit, Trash2, UserPlus } from "lucide-react";
+import { User, Edit, Trash2, UserPlus, Search } from "lucide-react";
 import { useForm } from "react-hook-form";
 
 import axiosInstance from "../services/axiosConfig";
 import toast from "react-hot-toast";
 import { url } from "../services/Url";
+import { useNavigate } from "react-router-dom";
 
 const AdminUserManagement = () => {
-  const [users, setUsers] = useState([]); 
+  const [users, setUsers] = useState([]);
+  const  navigate= useNavigate();
 
   const [newUser, setNewUser] = useState({
     id: "",
@@ -44,7 +46,6 @@ const AdminUserManagement = () => {
     formState: { errors },
   } = useForm();
 
- 
   useEffect(() => {
     async function fetchUsers() {
       try {
@@ -63,14 +64,14 @@ const AdminUserManagement = () => {
         setUsers(getData.users);
         console.log("Users data:", getData.users);
       } catch (error) {
-        console.error("Error fetching users:", error); 
+        console.error("Error fetching users:", error);
       }
     }
 
     fetchUsers();
   }, []);
   function OnSubmit(data) {
-    console.log(data); 
+    console.log(data);
 
     axiosInstance
       .post(`${url}/user/register`, data)
@@ -78,7 +79,7 @@ const AdminUserManagement = () => {
         console.log("Success:", response.data);
         toast.success("User Added Successfully");
         setIsAddDialogOpen(false);
-        setUsers([...users, response.data.user]); 
+        setUsers([...users, response.data.user]);
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -104,13 +105,12 @@ const AdminUserManagement = () => {
       console.log("Success:", response.data);
       toast.success("User updated successfully");
 
-      
       setUsers(
         users.map((user) =>
           user.userId === editingUser.userId ? response.data.user : user
         )
       );
-      setIsEditDialogOpen(false); 
+      setIsEditDialogOpen(false);
     } catch (error) {
       console.error("Error updating user:", error);
       toast.error("Failed to update user");
@@ -124,7 +124,7 @@ const AdminUserManagement = () => {
       const response = await axiosInstance.delete(
         `${url}/user/users/${userId}`
       );
-      console.log(response.data); 
+      console.log(response.data);
       toast.success("User deleted Succesfully");
     } catch (error) {
       console.error(
@@ -133,7 +133,7 @@ const AdminUserManagement = () => {
       );
     }
 
-    setUsers(users.filter((user) => user.userId !== userId)); 
+    setUsers(users.filter((user) => user.userId !== userId));
   }
 
   return (
@@ -142,11 +142,20 @@ const AdminUserManagement = () => {
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>User Management</CardTitle>
           <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <UserPlus className="mr-2 h-4 w-4" /> Add New User
-              </Button>
-            </DialogTrigger>
+            <div className="gap-2 flex">
+              <div>
+                <DialogTrigger asChild>
+                  <Button>
+                    <UserPlus className="mr-2 h-4 w-4" /> Add New User
+                  </Button>
+                </DialogTrigger>
+              </div>
+              <div className="flex ">
+                <button
+                   onClick={()=>{navigate("/patient-search")}} className="mr-2 flex p-1 text-sm font-semibold rounded-lg text-gray-100 justify-center items-center bg-black" > <Search className="p-1"/> Patient Search
+                </button>
+              </div>
+            </div>
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>Add New User</DialogTitle>

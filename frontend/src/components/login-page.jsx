@@ -7,6 +7,8 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import "react-toggle/style.css";
+import Toggle from "react-toggle";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Lock, User } from "lucide-react";
@@ -23,11 +25,12 @@ const LoginPage = () => {
     formState: { errors },
   } = useForm();
 
-  const [loginError, setLoginError] = useState(""); 
+  const [loginError, setLoginError] = useState("");
   const navigate = useNavigate();
+  const [isUser, setIsUser] = useState(true);
 
   const OnSubmit = async (data) => {
-    console.log(data);
+    // console.log(data);
     try {
       setLoginError("");
 
@@ -39,12 +42,18 @@ const LoginPage = () => {
           password: data.password,
         }
       );
-      console.log(response);
-     
+      // console.log(response);
+
       if (response.status === 200) {
-        toast.success("Login Successful");
-       
-        navigate("/patient-search");
+        if (isUser && response.data.user.role === "Staff") {
+          toast.success("Staff Login Successful ");
+          isUser ? navigate("/patient-search") : navigate("/user-management");
+        } else if (!isUser && response.data.user.role === "Admin") {
+          toast.success("Admin Login Successful ");
+          isUser ? navigate("/patient-search") : navigate("/user-management");
+        } else {
+          toast.error("Not valid role");
+        }
       }
     } catch (error) {
       // Handle errors
@@ -65,6 +74,34 @@ const LoginPage = () => {
           <CardTitle className="text-2xl font-bold text-center">
             Login
           </CardTitle>
+          <div
+            className="ml-20 flex justify-center items-center pt-5 pb-3 "
+            style={{ "--i": 0, "--j": 21 }}
+          >
+            <span
+              className={`mr-4 ${
+                isUser ? "text-black font-bold" : "text-gray-500"
+              }`}
+            >
+              User
+            </span>
+
+            <Toggle
+              Checked={false}
+              icons={false}
+              onChange={() => {
+                setIsUser(!isUser);
+              }}
+            />
+
+            <span
+              className={`ml-4 mr-20 ${
+                !isUser ? "text-black font-bold" : "text-gray-500"
+              }`}
+            >
+              Admin
+            </span>
+          </div>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(OnSubmit)}>
