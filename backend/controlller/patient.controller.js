@@ -4,12 +4,13 @@ export const registerPatient = async (req, res) => {
   const { UHID, LoyalityCard, name, currentPoints } = req.body;
 
   try {
-    // Check if UHID or Loyalty Card already exists
+    // Check if UHID already exists
     const existingPatient = await Patient.findOne({ UHID });
     if (existingPatient) {
       return res.status(400).json({ message: "UHID already exists" });
     }
 
+    // Check if Loyalty Card already exists
     const existingLoyaltyCard = await Patient.findOne({ LoyalityCard });
     if (existingLoyaltyCard) {
       return res.status(400).json({ message: "Loyalty Card already exists" });
@@ -21,16 +22,21 @@ export const registerPatient = async (req, res) => {
       LoyalityCard,
       name,
       currentPoints,
-      transaction: [],
+      transaction: [
+        {
+          points: currentPoints,
+          transactionType: "Add",
+          desk: "Front Desk",
+          remarks: "initial Points",
+        },
+      ], // Adding the initial transaction
     });
 
     await newPatient.save();
-    res
-      .status(201)
-      .json({
-        message: "Patient registered successfully",
-        patient: newPatient,
-      });
+    res.status(201).json({
+      message: "Patient registered successfully",
+      patient: newPatient,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
@@ -103,17 +109,17 @@ export const handleTransaction = async (req, res) => {
   }
 };
 
-export const  showTransaction = async(req,res)=>{
-try {
-  const {UHID} = req.params
-  const patient = await Patient.findOne({ UHID });
+export const showTransaction = async (req, res) => {
+  try {
+    const { UHID } = req.params;
+    const patient = await Patient.findOne({ UHID });
     if (!patient) {
-      return res.status(400).json({ message: 'Patient not found' });
+      return res.status(400).json({ message: "Patient not found" });
     }
-  const transactions = patient.transaction
-  return res.status(200).json({message:"success",transactions})
-} catch (error) {
-  console.log(error.message);
+    const transactions = patient.transaction;
+    return res.status(200).json({ message: "success", transactions });
+  } catch (error) {
+    console.log(error.message);
     res.status(500).json("error in show transaction controller");
-}
-}
+  }
+};

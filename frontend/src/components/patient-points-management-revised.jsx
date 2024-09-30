@@ -43,7 +43,7 @@ const PatientPointsManagement = () => {
 
         const getData = await response.json();
         setPatient(getData.patient);
-        console.log("ye lelelele", patient);
+
         setCurrentPoints(getData.patient?.currentPoints);
       } catch (error) {
         console.error("Error fetching patient data:", error);
@@ -93,7 +93,7 @@ const PatientPointsManagement = () => {
       );
 
       if (response.status === 200) {
-        toast.success("Changed Successful");
+        toast.success("Transaction Successful");
         const newCurrentPoints =
           data.transactionType === "Add"
             ? currentPoints + pointsInt
@@ -105,7 +105,7 @@ const PatientPointsManagement = () => {
           {
             ...data,
             amount: pointsInt,
-            createdAt: new Date().toISOString(), // Add this line
+            createdAt: new Date().toISOString(),
           },
         ]);
       }
@@ -184,7 +184,7 @@ const PatientPointsManagement = () => {
                   {...register("points", {
                     required: "This field is required",
                   })}
-                  disabled={isLoading} // Disable input while loading
+                  disabled={isLoading}
                 />
                 {errors.points && (
                   <p className="text-red-500 text-xs mt-1">
@@ -203,7 +203,7 @@ const PatientPointsManagement = () => {
                   {...register("transactionType", {
                     required: "Transaction Type is required",
                   })}
-                  disabled={isLoading} // Disable input while loading
+                  disabled={isLoading}
                 >
                   <option value="">Select Transaction Type</option>
                   <option value="Add">Add</option>
@@ -219,7 +219,7 @@ const PatientPointsManagement = () => {
                   id="desk"
                   name="desk"
                   {...register("desk", { required: "Desk is required" })}
-                  disabled={isLoading} // Disable input while loading
+                  disabled={isLoading}
                 >
                   <option value="">Select Desk</option>
                   <option value="Front Desk">Front Desk</option>
@@ -236,7 +236,7 @@ const PatientPointsManagement = () => {
                   {...register("remarks", {
                     required: "This field is required",
                   })}
-                  disabled={isLoading} // Disable input while loading
+                  disabled={isLoading}
                 />
                 {errors.remarks && (
                   <p className="text-red-500 text-xs mt-1">
@@ -270,36 +270,37 @@ const PatientPointsManagement = () => {
             </div>
           ) : (
             <div className="space-y-2">
-              {transactions.map((transaction, index) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between p-2 border rounded"
-                >
-                  <div>
-                    <p className="font-bold">
-                      {transaction.transactionType} {transaction.points} points
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      {transaction.remarks}
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      Desk: {transaction.desk}
-                    </p>
-                  </div>
-                  <div className="">
-                    <div className="flex items-center">
-                      <Clock className="mr-2 h-4 w-4" />
-                      <span>
-                        {transaction.createdAt
-                          ? transaction.createdAt.split("T")[0]
-                          : "N/A"}
-                      </span>
+
+              {transactions
+                .slice()
+                .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                .map((transaction, index) => {
+                  const date = new Date(transaction.createdAt);
+                  const formattedDate = date.toLocaleDateString();
+                  const formattedTime = date.toLocaleTimeString();
+
+                  return (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-2 border rounded"
+                    >
+                      <div>
+                        <p className="font-bold">
+                          {transaction.transactionType} {transaction.points} points
+                        </p>
+                        <p className="text-sm text-gray-500">{transaction.remarks}</p>
+                        <p className="text-sm text-gray-500">Desk: {transaction.desk}</p>
+                      </div>
+                      <div className="flex items-center">
+                        <Clock className="mr-2 h-4 w-4" />
+                        <span>
+                          {formattedDate} {formattedTime}
+                        </span>
+                      </div>
                     </div>
-                    <div className="text-sm text-gray-500">Role</div>
-                    <div className="text-sm text-gray-500">Username</div>
-                  </div>
-                </div>
-              ))}
+                  );
+                })}
+
             </div>
           )}
         </CardContent>
