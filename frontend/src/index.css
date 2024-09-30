@@ -27,7 +27,7 @@
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
-    --radius: 0.5rem
+    --radius: 0.5rem;
   }
   .dark {
     --background: 240 10% 3.9%;
@@ -53,7 +53,7 @@
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%
+    --chart-5: 340 75% 55%;
   }
 }
 @layer base {
@@ -62,5 +62,47 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+.spinner {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: radial-gradient(farthest-side, #050620 94%, #0000) top/9px 9px
+      no-repeat,
+    conic-gradient(#0000 30%, #050620);
+  -webkit-mask: radial-gradient(farthest-side, #0000 calc(100% - 9px), #000 0);
+  animation: spinner-c7wet2 1s infinite linear;
+}
+
+@keyframes spinner-c7wet2 {
+  100% {
+    transform: rotate(1turn);
+  }
+}
+
+.dots {
+  width: 40px;
+  height: 9.6px;
+  background: radial-gradient(circle closest-side,#ffffff 90%,#0000) 0%   50%,
+       radial-gradient(circle closest-side,#ffffff 90%,#0000) 50%  50%,
+       radial-gradient(circle closest-side,#ffffff 90%,#0000) 100% 50%;
+  background-size: calc(100%/3) 100%;
+  background-repeat: no-repeat;
+  animation: dots-zcf63l 1s infinite linear;
+}
+
+@keyframes dots-zcf63l {
+  33% {
+     background-size: calc(100%/3) 0%  ,calc(100%/3) 100%,calc(100%/3) 100%;
+  }
+
+  50% {
+     background-size: calc(100%/3) 100%,calc(100%/3) 0%  ,calc(100%/3) 100%;
+  }
+
+  66% {
+     background-size: calc(100%/3) 100%,calc(100%/3) 100%,calc(100%/3) 0%;
   }
 }

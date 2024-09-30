@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form";
 import axiosInstance from "../services/axiosConfig";
 import { url } from "../services/Url";
 import toast from "react-hot-toast";
+import { IoMdArrowRoundBack } from "react-icons/io";
 
 import {
   Dialog,
@@ -20,6 +21,8 @@ import { useNavigate } from "react-router-dom";
 
 const PatientSearchAndManagement = () => {
   const [showNewPatientForm, setShowNewPatientForm] = useState(false);
+  const [buttonLoading, setButtonLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState();
   const [searchResults, setSearchResults] = useState([]);
   const [insideQuerry, setInsideQuerry] = useState("");
 
@@ -28,26 +31,23 @@ const PatientSearchAndManagement = () => {
   const [patients, setPatients] = useState([]);
   const navigate = useNavigate();
 
-  
-
   const handleSearch = (query) => {
     console.log(query);
     setInsideQuerry(query);
     console.log("andr dekh", insideQuerry);
 
-   
     const filteredResults = patients.filter(
       (patient) =>
         patient.UHID.includes(query) ||
         patient.name.toLowerCase().includes(query.toLowerCase())
     );
 
-   
     setSearchResults(filteredResults);
   };
 
   useEffect(() => {
     async function fetchUsers() {
+      setIsLoading(true);
       try {
         const response = await fetch(`${url}/patient/getAllPatients`, {
           method: "GET",
@@ -60,21 +60,21 @@ const PatientSearchAndManagement = () => {
           throw new Error("Network response was not ok");
         }
 
-        const getData = await response.json(); 
+        const getData = await response.json();
 
         console.log("patient data:", getData.patients);
         setPatients(getData.patients);
-       
       } catch (error) {
-        console.error("Error fetching users:", error); 
+        console.error("Error fetching users:", error);
       }
+      setIsLoading(false);
     }
 
-    fetchUsers(); 
+    fetchUsers();
   }, []);
 
-  
   async function OnSubmit(data) {
+    setButtonLoading(true);
     try {
       const response = await axiosInstance.post(
         `${url}/patient/register`,
@@ -94,14 +94,23 @@ const PatientSearchAndManagement = () => {
         toast.error("An unexpected error occurred");
       }
     }
+    setButtonLoading(false);
   }
 
   return (
     <div className="p-4">
-     
       <Card className="mb-4">
         <CardHeader>
-          <CardTitle>Patient Search</CardTitle>
+          <CardTitle className="flex gap-2">
+            {" "}
+            <IoMdArrowRoundBack
+              className="cursor-pointer"
+              onClick={() => {
+                navigate(-1);
+              }}
+            />
+            Patient Search
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex space-x-2">
@@ -164,13 +173,21 @@ const PatientSearchAndManagement = () => {
                   })}
                 />
               </div>
-              <Button className="w-full">Register Patient</Button>
+              <Button className="w-full">
+                {" "}
+                {buttonLoading ? (
+                  <div className="flex justify-center items-center">
+                    <div className="dots text-white "></div>
+                  </div>
+                ) : (
+                  "Register Patient"
+                )}
+              </Button>
             </form>
           </CardContent>
         </Card>
       )}
 
-     
       {insideQuerry === "" && (
         <CardContent>
           <div className="overflow-x-auto">
@@ -181,20 +198,24 @@ const PatientSearchAndManagement = () => {
               <div>Points</div>
             </div>
             <div>
-              {patients.map((user) => (
-                <div
-                  key={user.id}
-                  className="grid grid-cols-4 gap-4 p-2 border-b"
-                >
-                  <div>{user.UHID}</div>
-                  <div>{user.LoyalityCard}</div>
-                  <div>{user.name}</div>
-                  <div>{user.currentPoints}</div>
-                  <div>
-                  
-                  </div>
+              {isLoading ? (
+                <div className="flex justify-center items-center">
+                  <div className="spinner"></div>
                 </div>
-              ))}
+              ) : (
+                patients.map((user) => (
+                  <div
+                    key={user.id}
+                    className="grid grid-cols-4 gap-4 p-2 border-b"
+                  >
+                    <div>{user.UHID}</div>
+                    <div>{user.LoyalityCard}</div>
+                    <div>{user.name}</div>
+                    <div>{user.currentPoints}</div>
+                    <div></div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </CardContent>
@@ -232,8 +253,6 @@ const PatientSearchAndManagement = () => {
           </CardContent>
         </Card>
       )}
-
-     
     </div>
   );
 };

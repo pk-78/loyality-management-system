@@ -28,15 +28,17 @@ const LoginPage = () => {
   const [loginError, setLoginError] = useState("");
   const navigate = useNavigate();
   const [isUser, setIsUser] = useState(true);
+  const [buttonLoading, setButtonLoading] = useState(false);
 
   const OnSubmit = async (data) => {
+    setButtonLoading(true);
     // console.log(data);
     try {
       setLoginError("");
 
       // Send login request to backend
       const response = await axiosInstance.post(
-        "http://localhost:5000/api/v1/user/login",
+        `${url}/user/login`,
         {
           userId: data.userId,
           password: data.password,
@@ -65,6 +67,7 @@ const LoginPage = () => {
         setLoginError("An unexpected error occurred");
       }
     }
+    setButtonLoading(false);
   };
 
   return (
@@ -151,7 +154,13 @@ const LoginPage = () => {
               <p className="text-red-500 text-sm mt-2">{loginError}</p>
             )}
             <Button type="submit" className="w-full mt-4">
-              Log In
+              {buttonLoading ? (
+                <div className="flex justify-center items-center">
+                  <div className="dots text-white "></div>
+                </div>
+              ) : (
+                "Log In"
+              )}
             </Button>
           </form>
         </CardContent>
