@@ -36,7 +36,7 @@ const LoginPage = () => {
 
       // Send login request to backend
       const response = await axiosInstance.post(
-        "http://localhost:5000/api/v1/user/login",
+        `${url}/user/login`,
         {
           userId: data.userId,
           password: data.password,
