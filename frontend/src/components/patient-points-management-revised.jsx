@@ -5,24 +5,30 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CreditCard, PlusCircle, MinusCircle, Clock, User } from "lucide-react";
 import { url } from "../services/Url";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import axiosInstance from "../services/axiosConfig";
 import toast from "react-hot-toast";
+import { IoMdArrowRoundBack } from "react-icons/io";
 
 const PatientPointsManagement = () => {
   const [patient, setPatient] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [buttonLoading, setButtonLoading] = useState(false);
   const [currentPoints, setCurrentPoints] = useState("");
   const [transactionType, setTransactionType] = useState("Add");
   const [remarks, setRemarks] = useState("");
   const [desk, setDesk] = useState("");
+  //const User = localStorage.getItem("token");
+
+  //console.log(User, "user lo");
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
   const { id } = useParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchPatient() {
@@ -37,6 +43,7 @@ const PatientPointsManagement = () => {
 
         const getData = await response.json();
         setPatient(getData.patient);
+
         setCurrentPoints(getData.patient?.currentPoints);
       } catch (error) {
         console.error("Error fetching patient data:", error);
@@ -73,7 +80,7 @@ const PatientPointsManagement = () => {
   async function OnSubmit(data) {
     console.log("Form data:", data);
     const pointsInt = parseInt(data.points, 10);
-
+    setButtonLoading(true);
     try {
       const response = await axiosInstance.post(
         `${url}/patient/patients/${id}/transaction`,
@@ -105,17 +112,29 @@ const PatientPointsManagement = () => {
     } catch (error) {
       toast.error("Something went wrong");
     }
+    setButtonLoading(false);
   }
 
   return (
     <div className="p-4">
       <Card className="mb-4">
         <CardHeader>
-          <CardTitle>Patient Information</CardTitle>
+          <CardTitle className="flex gap-2">
+            {" "}
+            <IoMdArrowRoundBack
+              className="cursor-pointer"
+              onClick={() => {
+                navigate(-1);
+              }}
+            />
+            Patient Information
+          </CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <p>Loading patient data...</p>
+            <div className="flex justify-start items-center text-sm pl-28 pt-14">
+              <div className="spinner text-sm "></div>
+            </div>
           ) : (
             <div className="flex items-center space-x-4">
               <User className="h-6 w-6" />
@@ -139,7 +158,9 @@ const PatientPointsManagement = () => {
           </CardHeader>
           <CardContent>
             {isLoading ? (
-              <p>Loading points...</p>
+              <div className="flex justify-center items-center text-sm">
+                <div className="spinner"></div>
+              </div>
             ) : (
               <div className="flex items-center justify-center">
                 <CreditCard className="mr-2 h-6 w-6" />
@@ -224,8 +245,14 @@ const PatientPointsManagement = () => {
                 )}
               </div>
 
-              <Button type="submit" disabled={isLoading}>
-                Submit Transaction
+              <Button type="submit">
+                {buttonLoading ? (
+                  <div className="flex justify-center items-center">
+                    <div className="dots text-white "></div>
+                  </div>
+                ) : (
+                  "Submit Transaction"
+                )}
               </Button>
             </form>
           </CardContent>
@@ -238,9 +265,12 @@ const PatientPointsManagement = () => {
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <p>Loading transaction history...</p>
+            <div className="flex justify-center items-center">
+              <div className="spinner"></div>
+            </div>
           ) : (
             <div className="space-y-2">
+
               {transactions
                 .slice()
                 .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
@@ -270,6 +300,7 @@ const PatientPointsManagement = () => {
                     </div>
                   );
                 })}
+
             </div>
           )}
         </CardContent>

@@ -3,6 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { TbLogout2 } from "react-icons/tb";
+
 import {
   Select,
   SelectContent,
@@ -36,6 +38,8 @@ const AdminUserManagement = () => {
     role: "",
   });
   const [editingUser, setEditingUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [buttonLoading, setButtonLoading] = useState(false);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedType, setSelectedType] = useState("");
@@ -48,6 +52,7 @@ const AdminUserManagement = () => {
 
   useEffect(() => {
     async function fetchUsers() {
+      setIsLoading(true);
       try {
         const response = await fetch(`${url}/user/getAllUsers`, {
           method: "GET",
@@ -66,12 +71,15 @@ const AdminUserManagement = () => {
       } catch (error) {
         console.error("Error fetching users:", error);
       }
+      setIsLoading(false);
     }
 
     fetchUsers();
   }, []);
+  console.log(users);
+
   function OnSubmit(data) {
-    console.log(data);
+    setButtonLoading(true);
 
     axiosInstance
       .post(`${url}/user/register`, data)
@@ -80,9 +88,11 @@ const AdminUserManagement = () => {
         toast.success("User Added Successfully");
         setIsAddDialogOpen(false);
         setUsers([...users, response.data.user]);
+        setButtonLoading(false);
       })
       .catch((error) => {
         console.error("Error:", error);
+        setButtonLoading(false);
       });
   }
 
@@ -91,6 +101,7 @@ const AdminUserManagement = () => {
     console.log("ye le name", editingUser.name);
     console.log("ye le password", editingUser.password);
     console.log("ye le role", editingUser.role);
+    setButtonLoading(true);
     try {
       const response = await axiosInstance.patch(
         `${url}/user/users/${editingUser.userId}`,
@@ -116,6 +127,7 @@ const AdminUserManagement = () => {
       toast.error("Failed to update user");
     }
     setEditingUser(false);
+    setButtonLoading(false);
   };
 
   async function handleDeleteUser(userId) {
@@ -140,7 +152,16 @@ const AdminUserManagement = () => {
     <div className="p-4">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>User Management</CardTitle>
+          <CardTitle className="flex gap-2">
+            {" "}
+            <TbLogout2
+              className="cursor-pointer"
+              onClick={() => {
+                navigate("/");
+              }}
+            />{" "}
+            User Management
+          </CardTitle>
           <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
             <div className="gap-2 flex">
               <div>
@@ -230,7 +251,16 @@ const AdminUserManagement = () => {
                   </select>
                 </div>
 
-                <Button type="submit">Add User</Button>
+                <Button type="submit">
+                  {" "}
+                  {buttonLoading ? (
+                    <div className="flex justify-center items-center">
+                      <div className="dots text-white "></div>
+                    </div>
+                  ) : (
+                    "Add User"
+                  )}
+                </Button>
               </form>
             </DialogContent>
           </Dialog>
@@ -244,109 +274,126 @@ const AdminUserManagement = () => {
               <div>Role</div>
               <div>Actions</div>
             </div>
-            {users.map((user) => (
-              <div
-                key={user.id}
-                className="grid grid-cols-5 gap-4 p-2 border-b"
-              >
-                <div>{user.userId}</div>
-                <div>{user.name}</div>
-                <div>{user.password}</div>
-                <div>{user.role}</div>
-                <div>
-                  <Dialog
-                    open={isEditDialogOpen}
-                    onOpenChange={setIsEditDialogOpen}
-                  >
-                    <DialogTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setEditingUser(user)}
-                      >
-                        <Edit className="h-4 w-4 mr-1" /> Edit
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Edit User</DialogTitle>
-                      </DialogHeader>
-                      {editingUser && (
-                        <div className="space-y-4">
-                          <div>
-                            <Label htmlFor="edit-id">User ID</Label>
-                            <Input
-                              id="edit-id"
-                              value={editingUser.userId}
-                              disable="true"
-                              onChange={(e) =>
-                                setEditingUser({
-                                  ...editingUser,
-                                  id: e.target.value,
-                                })
-                              }
-                            />
-                          </div>
-                          <div>
-                            <Label htmlFor="edit-name">Name</Label>
-                            <Input
-                              id="edit-name"
-                              value={editingUser.name}
-                              onChange={(e) =>
-                                setEditingUser({
-                                  ...editingUser,
-                                  name: e.target.value,
-                                })
-                              }
-                            />
-                          </div>
-                          <div>
-                            <Label htmlFor="edit-password">Password</Label>
-                            <Input
-                              id="edit-password"
-                              type="password"
-                              value={editingUser.password}
-                              onChange={(e) =>
-                                setEditingUser({
-                                  ...editingUser,
-                                  password: e.target.value,
-                                })
-                              }
-                            />
-                          </div>
-                          <div>
-                            <Label htmlFor="edit-role">Role</Label>
-                            <Select
-                              onValueChange={(value) =>
-                                setEditingUser({ ...editingUser, role: value })
-                              }
-                              defaultValue={editingUser.role}
-                            >
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select role" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="Admin">Admin</SelectItem>
-                                <SelectItem value="Staff">Staff</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <Button onClick={handleEditUser}>Save Changes</Button>
-                        </div>
-                      )}
-                    </DialogContent>
-                  </Dialog>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="ml-2"
-                    onClick={() => handleDeleteUser(user.userId)}
-                  >
-                    <Trash2 className="h-4 w-4 mr-1" /> Delete
-                  </Button>
-                </div>
+            {isLoading ? (
+              <div className=" items-center justify-center flex">
+                <div className="spinner"></div>
               </div>
-            ))}
+            ) : (
+              users.map((user) => (
+                <div
+                  key={user.id}
+                  className="grid grid-cols-5 gap-4 p-2 border-b"
+                >
+                  <div>{user.userId}</div>
+                  <div>{user.name}</div>
+                  <div>{user.password}</div>
+                  <div>{user.role}</div>
+                  <div>
+                    <Dialog
+                      open={isEditDialogOpen}
+                      onOpenChange={setIsEditDialogOpen}
+                    >
+                      <DialogTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setEditingUser(user)}
+                        >
+                          <Edit className="h-4 w-4 mr-1" /> Edit
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Edit User</DialogTitle>
+                        </DialogHeader>
+                        {editingUser && (
+                          <div className="space-y-4">
+                            <div>
+                              <Label htmlFor="edit-id">User ID</Label>
+                              <Input
+                                id="edit-id"
+                                value={editingUser.userId}
+                                disable="true"
+                                onChange={(e) =>
+                                  setEditingUser({
+                                    ...editingUser,
+                                    id: e.target.value,
+                                  })
+                                }
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="edit-name">Name</Label>
+                              <Input
+                                id="edit-name"
+                                value={editingUser.name}
+                                onChange={(e) =>
+                                  setEditingUser({
+                                    ...editingUser,
+                                    name: e.target.value,
+                                  })
+                                }
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="edit-password">Password</Label>
+                              <Input
+                                id="edit-password"
+                                type="password"
+                                value={editingUser.password}
+                                onChange={(e) =>
+                                  setEditingUser({
+                                    ...editingUser,
+                                    password: e.target.value,
+                                  })
+                                }
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="edit-role">Role</Label>
+                              <Select
+                                onValueChange={(value) =>
+                                  setEditingUser({
+                                    ...editingUser,
+                                    role: value,
+                                  })
+                                }
+                                defaultValue={editingUser.role}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select role" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="Admin">Admin</SelectItem>
+                                  <SelectItem value="Staff">Staff</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <Button onClick={handleEditUser}>
+                              {buttonLoading ? (
+                                <div className="flex justify-center items-center">
+                                  <div className="dots text-white "></div>
+                                </div>
+                              ) : (
+                                "Confirm Changes"
+                              )}
+                            </Button>
+                          </div>
+                        )}
+                      </DialogContent>
+                    </Dialog>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="ml-2"
+                      onClick={() => handleDeleteUser(user.userId)}
+                    >
+                      <Trash2 className="h-4 w-4 mr-1" /> Delete
+                    </Button>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </CardContent>
       </Card>
