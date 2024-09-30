@@ -27,7 +27,7 @@ import { useNavigate } from "react-router-dom";
 
 const AdminUserManagement = () => {
   const [users, setUsers] = useState([]);
-  const  navigate= useNavigate();
+  const navigate = useNavigate();
 
   const [newUser, setNewUser] = useState({
     id: "",
@@ -152,7 +152,13 @@ const AdminUserManagement = () => {
               </div>
               <div className="flex ">
                 <button
-                   onClick={()=>{navigate("/patient-search")}} className="mr-2 flex p-1 text-sm font-semibold rounded-lg text-gray-100 justify-center items-center bg-black" > <Search className="p-1"/> Patient Search
+                  onClick={() => {
+                    navigate("/patient-search");
+                  }}
+                  className="mr-2 flex p-1 text-sm font-semibold rounded-lg text-gray-100 justify-center items-center bg-black"
+                >
+                  {" "}
+                  <Search className="p-1" /> Patient Search
                 </button>
               </div>
             </div>
