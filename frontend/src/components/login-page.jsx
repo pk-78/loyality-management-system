@@ -18,7 +18,7 @@ import { useForm } from "react-hook-form";
 import { url } from "../services/Url";
 import axiosInstance from "../services/axiosConfig";
 
-const LoginPage = () => {
+const LoginPage = ({ setIsUsername }) => {
   const {
     register,
     handleSubmit,
@@ -32,42 +32,57 @@ const LoginPage = () => {
 
   const OnSubmit = async (data) => {
     setButtonLoading(true);
-    // console.log(data);
-    try {
-      setLoginError("");
+    setLoginError(""); // Clear previous login errors
 
-      // Send login request to backend
-      const response = await axiosInstance.post(
-        `${url}/user/login`,
-        {
-          userId: data.userId,
-          password: data.password,
-        }
-      );
-      // console.log(response);
+    try {
+      // Send login request to the backend
+      const response = await axiosInstance.post(`${url}/user/login`, {
+        userId: data.userId,
+        password: data.password,
+      });
 
       if (response.status === 200) {
-        if (isUser && response.data.user.role === "Staff") {
-          toast.success("Staff Login Successful ");
-          isUser ? navigate("/patient-search") : navigate("/user-management");
-        } else if (!isUser && response.data.user.role === "Admin") {
-          toast.success("Admin Login Successful ");
-          isUser ? navigate("/patient-search") : navigate("/user-management");
+        const { user, token } = response.data;
+        setIsUsername(user.userId);
+
+        // Store token in local storage
+
+        // Check user role and redirect accordingly
+        if (user.role === "Staff" && isUser) {
+          localStorage.setItem("userData", token);
+          localStorage.setItem("userId", user.userId);
+          localStorage.setItem("role", user.role);
+          toast.success("Staff Login Successful");
+          navigate("/patient-search");
+        } else if (user.role === "Admin" && !isUser) {
+          toast.success("Admin Login Successful");
+          localStorage.setItem("userId", user.userId);
+          localStorage.setItem("role", user.role);
+          localStorage.setItem("userData", token);
+          navigate("/user-management");
         } else {
-          toast.error("Not valid role");
+          toast.error("Not a valid role");
         }
       }
     } catch (error) {
-      // Handle errors
-      if (error.response && error.response.status === 401) {
-        setLoginError("Invalid User ID or password");
-      } else if (error.response && error.response.status === 404) {
-        setLoginError("User not found");
+      // Handle specific error cases
+      if (error.response) {
+        switch (error.response.status) {
+          case 401:
+            setLoginError("Invalid User ID or password");
+            break;
+          case 404:
+            setLoginError("User not found");
+            break;
+          default:
+            setLoginError("An unexpected error occurred");
+        }
       } else {
-        setLoginError("An unexpected error occurred");
+        setLoginError("Unable to connect to server");
       }
+    } finally {
+      setButtonLoading(false);
     }
-    setButtonLoading(false);
   };
 
   return (

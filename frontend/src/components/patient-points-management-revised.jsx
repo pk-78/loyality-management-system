@@ -11,17 +11,14 @@ import axiosInstance from "../services/axiosConfig";
 import toast from "react-hot-toast";
 import { IoMdArrowRoundBack } from "react-icons/io";
 
-const PatientPointsManagement = () => {
+const PatientPointsManagement = ({ isUsername }) => {
   const [patient, setPatient] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [buttonLoading, setButtonLoading] = useState(false);
   const [currentPoints, setCurrentPoints] = useState("");
-  const [transactionType, setTransactionType] = useState("Add");
-  const [remarks, setRemarks] = useState("");
-  const [desk, setDesk] = useState("");
-  //const User = localStorage.getItem("token");
+  const transactionUserId = localStorage.getItem("userId") ||{};
 
-  //console.log(User, "user lo");
+
   const {
     register,
     handleSubmit,
@@ -76,6 +73,7 @@ const PatientPointsManagement = () => {
   }, [id]);
 
   const [transactions, setTransactions] = useState([]);
+  console.log(transactions);
 
   async function OnSubmit(data) {
     console.log("Form data:", data);
@@ -89,6 +87,7 @@ const PatientPointsManagement = () => {
           points: pointsInt,
           remarks: data.remarks,
           transactionType: data.transactionType,
+          transactionUsername: data.transactionUsername,
         }
       );
 
@@ -175,7 +174,7 @@ const PatientPointsManagement = () => {
             <CardTitle>Add/Deduct Points</CardTitle>
           </CardHeader>
           <CardContent>
-            <form className="space-y-4" onSubmit={handleSubmit(OnSubmit)}>
+            <form className="space-y-2" onSubmit={handleSubmit(OnSubmit)}>
               <div>
                 <Label htmlFor="points">Points</Label>
                 <Input
@@ -185,6 +184,23 @@ const PatientPointsManagement = () => {
                     required: "This field is required",
                   })}
                   disabled={isLoading}
+                />
+                {errors.points && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.points?.message}
+                  </p>
+                )}
+              </div>
+              <div>
+                <Label htmlFor="points">User</Label>
+                <Input
+                  id="currentUser"
+                  placeholder="currentUser"
+                  defaultValue={transactionUserId}
+                  {...register("transactionUsername", {
+                    required: "This field is required",
+                  })}
+                  readOnly
                 />
                 {errors.points && (
                   <p className="text-red-500 text-xs mt-1">
@@ -270,7 +286,6 @@ const PatientPointsManagement = () => {
             </div>
           ) : (
             <div className="space-y-2">
-
               {transactions
                 .slice()
                 .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
@@ -286,21 +301,34 @@ const PatientPointsManagement = () => {
                     >
                       <div>
                         <p className="font-bold">
-                          {transaction.transactionType} {transaction.points} points
+                          {transaction.transactionType} {transaction.points}{" "}
+                          points
                         </p>
-                        <p className="text-sm text-gray-500">{transaction.remarks}</p>
-                        <p className="text-sm text-gray-500">Desk: {transaction.desk}</p>
+                        <p className="text-sm text-gray-500">
+                          {transaction.remarks}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          Desk: {transaction.desk}
+                        </p>
                       </div>
-                      <div className="flex items-center">
-                        <Clock className="mr-2 h-4 w-4" />
-                        <span>
-                          {formattedDate} {formattedTime}
-                        </span>
+                      <div>
+                        <div className="flex items-center">
+                          <Clock className="mr-2 h-4 w-4" />
+                          <span>
+                            {formattedDate} {formattedTime}
+                          </span>
+                        </div>
+                        <div className="flex  justify-end">
+                          <div>
+                            <p className="text-sm text-gray-500">
+                              {transaction.transactionUsername}
+                            </p>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   );
                 })}
-
             </div>
           )}
         </CardContent>

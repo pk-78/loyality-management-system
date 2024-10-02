@@ -39,10 +39,10 @@ export const registerUser = async (req, res) => {
 export const loginUser = async (req, res) => {
   try {
     const { userId, password } = req.body;
-    console.log(userId, password)
+    console.log(userId, password);
     // Find user by userId
-    const user = await User.findOne({ userId:userId });
-    console.log(user)
+    const user = await User.findOne({ userId: userId });
+    console.log(user);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -59,13 +59,14 @@ export const loginUser = async (req, res) => {
       SECRET_KEY,
       { expiresIn: "1h" } // Token expiration time
     );
-
+    console.log(token)
     // Respond with success and token
     return res.status(200).json({
       message: "Login successful",
       token,
       user: { userId: user.userId, name: user.name, role: user.role },
     });
+    
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Internal server error" });
@@ -111,57 +112,57 @@ export const verifyToken = (res, req, next) => {
 };
 
 export const editUser = async (req, res) => {
-    try {
-      const { userId, name, role, password } = req.body; 
-  
-      // Find the user by userId
-      const user = await User.findOne({ userId });
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-  
-      // Update the fields if provided in the request body
-      if (name) user.name = name;
-      if (role) user.role = role;
-  
-      // If the password is being updated, hash the new password
-      if (password) {
-        user.password = await bcrypt.hash(password, 10);
-      }
-  
-      // Save the updated user in the database
-      await user.save();
-  
-      // Return a success response with the updated user data
-      return res.status(200).json({
-        message: "User updated successfully",
-        user: { userId: user.userId, name: user.name, role: user.role },
-      });
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ message: "Internal server error" });
+  try {
+    const { userId, name, role, password } = req.body;
+
+    // Find the user by userId
+    const user = await User.findOne({ userId });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
-  };
+
+    // Update the fields if provided in the request body
+    if (name) user.name = name;
+    if (role) user.role = role;
+
+    // If the password is being updated, hash the new password
+    if (password) {
+      user.password = await bcrypt.hash(password, 10);
+    }
+
+    // Save the updated user in the database
+    await user.save();
+
+    // Return a success response with the updated user data
+    return res.status(200).json({
+      message: "User updated successfully",
+      user: { userId: user.userId, name: user.name, role: user.role },
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
 
 // Delete user without verifyToken
 
 // Controller to delete a user by userId
 export const deleteUser = async (req, res) => {
-    try {
-        const { userId } = req.params; // Extract userId from URL parameters
+  try {
+    const { userId } = req.params; // Extract userId from URL parameters
 
-        // Find and delete the user by their userId
-        const user = await User.findOneAndDelete({ userId });
-        
-        // If no user is found, send a 404 response
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
+    // Find and delete the user by their userId
+    const user = await User.findOneAndDelete({ userId });
 
-        // If user is deleted successfully, send a 200 response
-        return res.status(200).json({ message: 'User deleted successfully' });
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: 'Internal server error' });
+    // If no user is found, send a 404 response
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
+
+    // If user is deleted successfully, send a 200 response
+    return res.status(200).json({ message: "User deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
 };
