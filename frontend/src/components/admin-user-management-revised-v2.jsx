@@ -67,7 +67,6 @@ const AdminUserManagement = () => {
 
         const getData = await response.json();
         setUsers(getData.users);
-        console.log("Users data:", getData.users);
       } catch (error) {
         console.error("Error fetching users:", error);
       }
@@ -76,7 +75,6 @@ const AdminUserManagement = () => {
 
     fetchUsers();
   }, []);
-  console.log(users);
 
   function OnSubmit(data) {
     setButtonLoading(true);
@@ -84,7 +82,6 @@ const AdminUserManagement = () => {
     axiosInstance
       .post(`${url}/user/register`, data)
       .then((response) => {
-        console.log("Success:", response.data);
         toast.success("User Added Successfully");
         setIsAddDialogOpen(false);
         setUsers([...users, response.data.user]);
@@ -97,10 +94,6 @@ const AdminUserManagement = () => {
   }
 
   const handleEditUser = async (userId) => {
-    console.log("ye le", editingUser.userId);
-    console.log("ye le name", editingUser.name);
-    console.log("ye le password", editingUser.password);
-    console.log("ye le role", editingUser.role);
     setButtonLoading(true);
     try {
       const response = await axiosInstance.patch(
@@ -113,7 +106,6 @@ const AdminUserManagement = () => {
         }
       );
 
-      console.log("Success:", response.data);
       toast.success("User updated successfully");
 
       setUsers(
@@ -131,12 +123,11 @@ const AdminUserManagement = () => {
   };
 
   async function handleDeleteUser(userId) {
-    console.log("delete krna h", userId);
     try {
       const response = await axiosInstance.delete(
         `${url}/user/users/${userId}`
       );
-      console.log(response.data);
+
       toast.success("User deleted Succesfully");
     } catch (error) {
       console.error(
@@ -152,11 +143,7 @@ const AdminUserManagement = () => {
     <div className="p-4">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="flex gap-2 ">
-            {" "}
-            {" "}
-            User Management
-          </CardTitle>
+          <CardTitle className="flex gap-2 "> User Management</CardTitle>
           <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
             <div className="gap-2 flex">
               <div>
@@ -177,16 +164,16 @@ const AdminUserManagement = () => {
                   <Search className="p-1" /> Patient Search
                 </button>
                 <TbLogout2
-              className="cursor-pointer text-2xl mt-1 "
-              onClick={() => {
-                localStorage.removeItem("userData");
-                localStorage.removeItem("userId");
-                localStorage.removeItem("role");
-                toast.success("Logout Successfully")
+                  className="cursor-pointer text-2xl mt-1 "
+                  onClick={() => {
+                    localStorage.removeItem("userData");
+                    localStorage.removeItem("userId");
+                    localStorage.removeItem("role");
+                    toast.success("Logout Successfully");
 
-                navigate("/login");
-              }}
-            />
+                    navigate("/login");
+                  }}
+                />
               </div>
             </div>
             <DialogContent>

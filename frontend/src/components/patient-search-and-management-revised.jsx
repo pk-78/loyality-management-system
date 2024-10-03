@@ -34,17 +34,23 @@ const PatientSearchAndManagement = ({ isUser }) => {
   const role = localStorage.getItem("role") || {};
 
   const handleSearch = (query) => {
-    console.log(query);
     setInsideQuerry(query);
-    console.log("andr dekh", insideQuerry);
 
+    // Filter the results
     const filteredResults = patients.filter(
       (patient) =>
         patient.UHID.includes(query) ||
         patient.name.toLowerCase().includes(query.toLowerCase())
     );
 
-    setSearchResults(filteredResults);
+    // Use a Set to avoid duplicate UHID entries (you can also use other unique fields)
+    const uniqueResults = Array.from(
+      new Set(filteredResults.map((patient) => patient.UHID))
+    ).map((uhid) => {
+      return filteredResults.find((patient) => patient.UHID === uhid);
+    });
+
+    setSearchResults(uniqueResults);
   };
 
   useEffect(() => {
@@ -64,7 +70,7 @@ const PatientSearchAndManagement = ({ isUser }) => {
 
         const getData = await response.json();
 
-        console.log("patient data:", getData.patients);
+        // console.log("patient data:", getData.patients);
         setPatients(getData.patients);
       } catch (error) {
         console.error("Error fetching users:", error);
@@ -82,7 +88,7 @@ const PatientSearchAndManagement = ({ isUser }) => {
         `${url}/patient/register`,
         data
       );
-      console.log(data);
+      // console.log(data);
       if (response.status === 201) {
         toast.success("Patient Added Successfully");
         setPatients([...patients, response.data.patient]);
