@@ -5,27 +5,40 @@ import PatientPointsManagement from "./components/patient-points-management-revi
 import PatientSearchAndManagement from "./components/patient-search-and-management-revised";
 import { Toaster } from "react-hot-toast";
 import PrivateRoutes from "./services/PrivateRoute";
+import { useState } from "react";
 
 function App() {
+  const [isUsername, setIsUsername] = useState("");
+ 
+
   return (
     <>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<LoginPage />} />
-          <Route path="/login" element={<LoginPage />} />
+          <Route
+            path="/"
+            element={
+              <LoginPage setIsUsername={setIsUsername}  />
+            }
+          />
+          <Route
+            path="/login"
+            element={
+              <LoginPage setIsUsername={setIsUsername}  />
+            }
+          />
           <Route
             path="/user-management"
             element={
               // <PrivateRoutes>
-                <AdminUserManagement />
-           
+              <AdminUserManagement />
             }
           />
           <Route
             path="/patient-point/:id"
             element={
               // <PrivateRoutes>
-              <PatientPointsManagement />
+              <PatientPointsManagement  isUsername={isUsername} />
               // </PrivateRoutes>
             }
           />
@@ -33,8 +46,7 @@ function App() {
             path="/patient-search"
             element={
               // <PrivateRoutes>
-                <PatientSearchAndManagement />
-              
+              <PatientSearchAndManagement />
             }
           />
         </Routes>

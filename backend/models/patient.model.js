@@ -19,6 +19,10 @@ const transactionSchema = mongoose.Schema(
     remarks: {
       type: String,
     },
+    transactionUsername:{
+      type:String,
+      
+    }
   },
   { timestamps: true }
 );

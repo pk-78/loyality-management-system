@@ -1,4 +1,3 @@
-
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
@@ -19,13 +18,9 @@ app.use(cors());
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/patient", patientRouter);
 
-
-
-app.get("/",(req,res)=>{
-    return res.send("hello")
-})
-
-
+app.get("/", (req, res) => {
+  return res.send("hello");
+});
 
 app.listen(port, () => {
   console.log(`Server started on http://localhost:${port}`);

@@ -152,14 +152,9 @@ const AdminUserManagement = () => {
     <div className="p-4">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="flex gap-2">
+          <CardTitle className="flex gap-2 ">
             {" "}
-            <TbLogout2
-              className="cursor-pointer"
-              onClick={() => {
-                navigate("/");
-              }}
-            />{" "}
+            {" "}
             User Management
           </CardTitle>
           <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
@@ -181,6 +176,17 @@ const AdminUserManagement = () => {
                   {" "}
                   <Search className="p-1" /> Patient Search
                 </button>
+                <TbLogout2
+              className="cursor-pointer text-2xl mt-1 "
+              onClick={() => {
+                localStorage.removeItem("userData");
+                localStorage.removeItem("userId");
+                localStorage.removeItem("role");
+                toast.success("Logout Successfully")
+
+                navigate("/login");
+              }}
+            />
               </div>
             </div>
             <DialogContent>

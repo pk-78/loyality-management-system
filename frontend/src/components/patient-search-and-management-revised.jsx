@@ -18,8 +18,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useNavigate } from "react-router-dom";
+import { TbLogout2 } from "react-icons/tb";
 
-const PatientSearchAndManagement = () => {
+const PatientSearchAndManagement = ({ isUser }) => {
   const [showNewPatientForm, setShowNewPatientForm] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
   const [isLoading, setIsLoading] = useState();
@@ -30,6 +31,7 @@ const PatientSearchAndManagement = () => {
 
   const [patients, setPatients] = useState([]);
   const navigate = useNavigate();
+  const role = localStorage.getItem("role") || {};
 
   const handleSearch = (query) => {
     console.log(query);
@@ -101,14 +103,27 @@ const PatientSearchAndManagement = () => {
     <div className="p-4">
       <Card className="mb-4">
         <CardHeader>
-          <CardTitle className="flex gap-2">
+          <CardTitle className="flex gap-2 relative">
             {" "}
-            <IoMdArrowRoundBack
-              className="cursor-pointer"
-              onClick={() => {
-                navigate(-1);
-              }}
-            />
+            {role === "Staff" ? (
+              <TbLogout2
+                className="cursor-pointer text-xl absolute right-2"
+                onClick={() => {
+                  localStorage.removeItem("userData");
+                  localStorage.removeItem("userId");
+                  localStorage.removeItem("role");
+                  toast.success("Logout Successfully");
+                  navigate("/login");
+                }}
+              />
+            ) : (
+              <IoMdArrowRoundBack
+                className="cursor-pointer"
+                onClick={() => {
+                  navigate(-1);
+                }}
+              />
+            )}
             Patient Search
           </CardTitle>
         </CardHeader>

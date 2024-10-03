@@ -74,7 +74,7 @@ export const getPatientByUHID = async (req, res) => {
 export const handleTransaction = async (req, res) => {
   try {
     const { UHID } = req.params;
-    const { points, transactionType, desk, remarks } = req.body;
+    const { points, transactionType, desk, remarks,transactionUsername } = req.body;
 
     // Find the patient by UHID
     const patient = await Patient.findOne({ UHID });
@@ -96,6 +96,7 @@ export const handleTransaction = async (req, res) => {
       transactionType,
       desk,
       remarks,
+      transactionUsername,
       date: new Date(), // Store the date of the transaction
     });
 
