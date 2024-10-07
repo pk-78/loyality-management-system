@@ -212,11 +212,12 @@ const PatientSearchAndManagement = ({ isUser }) => {
       {insideQuerry === "" && (
         <CardContent>
           <div className="overflow-x-auto">
-            <div className="grid grid-cols-4 gap-4 font-bold mb-2 p-2 bg-gray-100">
+            <div className="grid grid-cols-5 gap-4 font-bold mb-2 p-2 bg-gray-100">
               <div>UHID</div>
               <div>Loyality Card Number</div>
               <div>Name</div>
               <div>Points</div>
+              <div>Manage</div>
             </div>
             <div>
               {isLoading ? (
@@ -227,13 +228,20 @@ const PatientSearchAndManagement = ({ isUser }) => {
                 patients.map((user) => (
                   <div
                     key={user.id}
-                    className="grid grid-cols-4 gap-4 p-2 border-b"
+                    className="grid grid-cols-5 gap-4 p-2 border-b"
                   >
                     <div>{user.UHID}</div>
                     <div>{user.LoyalityCard}</div>
                     <div>{user.name}</div>
                     <div>{user.currentPoints}</div>
-                    <div></div>
+                    <div>
+                      <Button
+                        onClick={() => navigate(`/patient-point/${user.UHID}`)}
+                        variant="outline"
+                      >
+                        Manage Points
+                      </Button>
+                    </div>
                   </div>
                 ))
               )}
