@@ -34,17 +34,23 @@ const PatientSearchAndManagement = ({ isUser }) => {
   const role = localStorage.getItem("role") || {};
 
   const handleSearch = (query) => {
-    console.log(query);
     setInsideQuerry(query);
-    console.log("andr dekh", insideQuerry);
 
+    // Filter the results
     const filteredResults = patients.filter(
       (patient) =>
         patient.UHID.includes(query) ||
         patient.name.toLowerCase().includes(query.toLowerCase())
     );
 
-    setSearchResults(filteredResults);
+    // Use a Set to avoid duplicate UHID entries (you can also use other unique fields)
+    const uniqueResults = Array.from(
+      new Set(filteredResults.map((patient) => patient.UHID))
+    ).map((uhid) => {
+      return filteredResults.find((patient) => patient.UHID === uhid);
+    });
+
+    setSearchResults(uniqueResults);
   };
 
   useEffect(() => {
@@ -64,7 +70,7 @@ const PatientSearchAndManagement = ({ isUser }) => {
 
         const getData = await response.json();
 
-        console.log("patient data:", getData.patients);
+        // console.log("patient data:", getData.patients);
         setPatients(getData.patients);
       } catch (error) {
         console.error("Error fetching users:", error);
@@ -82,7 +88,7 @@ const PatientSearchAndManagement = ({ isUser }) => {
         `${url}/patient/register`,
         data
       );
-      console.log(data);
+      // console.log(data);
       if (response.status === 201) {
         toast.success("Patient Added Successfully");
         setPatients([...patients, response.data.patient]);
@@ -206,11 +212,12 @@ const PatientSearchAndManagement = ({ isUser }) => {
       {insideQuerry === "" && (
         <CardContent>
           <div className="overflow-x-auto">
-            <div className="grid grid-cols-4 gap-4 font-bold mb-2 p-2 bg-gray-100">
+            <div className="grid grid-cols-5 gap-4 font-bold mb-2 p-2 bg-gray-100">
               <div>UHID</div>
               <div>Loyality Card Number</div>
               <div>Name</div>
               <div>Points</div>
+              <div>Manage</div>
             </div>
             <div>
               {isLoading ? (
@@ -221,13 +228,20 @@ const PatientSearchAndManagement = ({ isUser }) => {
                 patients.map((user) => (
                   <div
                     key={user.id}
-                    className="grid grid-cols-4 gap-4 p-2 border-b"
+                    className="grid grid-cols-5 gap-4 p-2 border-b"
                   >
                     <div>{user.UHID}</div>
                     <div>{user.LoyalityCard}</div>
                     <div>{user.name}</div>
                     <div>{user.currentPoints}</div>
-                    <div></div>
+                    <div>
+                      <Button
+                        onClick={() => navigate(`/patient-point/${user.UHID}`)}
+                        variant="outline"
+                      >
+                        Manage Points
+                      </Button>
+                    </div>
                   </div>
                 ))
               )}

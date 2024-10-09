@@ -66,19 +66,24 @@ const LoginPage = ({ setIsUsername }) => {
       }
     } catch (error) {
       // Handle specific error cases
-      if (error.response) {
-        switch (error.response.status) {
-          case 401:
-            setLoginError("Invalid User ID or password");
-            break;
-          case 404:
-            setLoginError("User not found");
-            break;
-          default:
-            setLoginError("An unexpected error occurred");
-        }
+      if (error.response.status === 401 || 404) {
+        toast.error("Invalid User ID or password");
+        // switch (error.response.status) {
+        //   case 401:
+
+        //     // setLoginError("Invalid User ID or password");
+        //     break;
+        //   // case 404:
+        //   //   toast.error("User not found");
+        //   //   setLoginError("User not found");
+        //   //   break;
+        //   default:
+        //     toast.error("An unexpected error occurred");
+        //   // setLoginError("An unexpected error occurred");
+        // }
       } else {
-        setLoginError("Unable to connect to server");
+        toast.error("An unexpected error occurred");
+        // setLoginError("Unable to connect to server");
       }
     } finally {
       setButtonLoading(false);

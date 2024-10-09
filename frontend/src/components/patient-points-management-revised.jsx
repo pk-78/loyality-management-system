@@ -16,8 +16,7 @@ const PatientPointsManagement = ({ isUsername }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [buttonLoading, setButtonLoading] = useState(false);
   const [currentPoints, setCurrentPoints] = useState("");
-  const transactionUserId = localStorage.getItem("userId") ||{};
-
+  const transactionUserId = localStorage.getItem("userId") || {};
 
   const {
     register,
@@ -73,10 +72,8 @@ const PatientPointsManagement = ({ isUsername }) => {
   }, [id]);
 
   const [transactions, setTransactions] = useState([]);
-  console.log(transactions);
 
   async function OnSubmit(data) {
-    console.log("Form data:", data);
     const pointsInt = parseInt(data.points, 10);
     setButtonLoading(true);
     try {

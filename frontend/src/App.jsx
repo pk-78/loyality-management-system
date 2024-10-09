@@ -6,6 +6,7 @@ import PatientSearchAndManagement from "./components/patient-search-and-manageme
 import { Toaster } from "react-hot-toast";
 import PrivateRoutes from "./services/PrivateRoute";
 import { useState } from "react";
+import AdminRoute from "./services/AdminRoute";
 
 function App() {
   const [isUsername, setIsUsername] = useState("");
@@ -30,8 +31,9 @@ function App() {
           <Route
             path="/user-management"
             element={
-              // <PrivateRoutes>
+              <AdminRoute>
               <AdminUserManagement />
+              </AdminRoute>
             }
           />
           <Route
