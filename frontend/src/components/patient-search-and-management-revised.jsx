@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Search, UserPlus, Trash2, Edit } from "lucide-react";
 import { useForm } from "react-hook-form";
-import axiosInstance from "../services/axiosConfig";
+import axios from "axios"
 import { url } from "../services/Url";
 import toast from "react-hot-toast";
 import { IoMdArrowRoundBack } from "react-icons/io";
@@ -84,7 +84,7 @@ const PatientSearchAndManagement = ({ isUser }) => {
   async function OnSubmit(data) {
     setButtonLoading(true);
     try {
-      const response = await axiosInstance.post(
+      const response = await axios.post(
         `${url}/patient/register`,
         data
       );

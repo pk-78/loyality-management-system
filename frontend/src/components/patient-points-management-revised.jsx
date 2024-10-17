@@ -7,9 +7,9 @@ import { CreditCard, PlusCircle, MinusCircle, Clock, User } from "lucide-react";
 import { url } from "../services/Url";
 import { useNavigate, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import axiosInstance from "../services/axiosConfig";
 import toast from "react-hot-toast";
 import { IoMdArrowRoundBack } from "react-icons/io";
+import axios from "axios";
 
 const PatientPointsManagement = ({ isUsername }) => {
   const [patient, setPatient] = useState(null);
@@ -77,7 +77,7 @@ const PatientPointsManagement = ({ isUsername }) => {
     const pointsInt = parseInt(data.points, 10);
     setButtonLoading(true);
     try {
-      const response = await axiosInstance.post(
+      const response = await axios.post(
         `${url}/patient/patients/${id}/transaction`,
         {
           desk: data.desk,
