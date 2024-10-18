@@ -16,7 +16,8 @@ import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { url } from "../services/Url";
-import axiosInstance from "../services/axiosConfig";
+import axios from "axios";
+
 
 const LoginPage = ({ setIsUsername }) => {
   const {
@@ -36,7 +37,7 @@ const LoginPage = ({ setIsUsername }) => {
 
     try {
       // Send login request to the backend
-      const response = await axiosInstance.post(`${url}/user/login`, {
+      const response = await axios.post(`${url}/user/login`, {
         userId: data.userId,
         password: data.password,
       });

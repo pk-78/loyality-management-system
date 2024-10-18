@@ -21,11 +21,10 @@ import {
 } from "@/components/ui/dialog";
 import { User, Edit, Trash2, UserPlus, Search } from "lucide-react";
 import { useForm } from "react-hook-form";
-
-import axiosInstance from "../services/axiosConfig";
 import toast from "react-hot-toast";
 import { url } from "../services/Url";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const AdminUserManagement = () => {
   const [users, setUsers] = useState([]);
@@ -79,7 +78,7 @@ const AdminUserManagement = () => {
   function OnSubmit(data) {
     setButtonLoading(true);
 
-    axiosInstance
+    axios
       .post(`${url}/user/register`, data)
       .then((response) => {
         toast.success("User Added Successfully");
@@ -96,7 +95,7 @@ const AdminUserManagement = () => {
   const handleEditUser = async (userId) => {
     setButtonLoading(true);
     try {
-      const response = await axiosInstance.patch(
+      const response = await axios.patch(
         `${url}/user/users/${editingUser.userId}`,
         {
           userId: editingUser.userId,
@@ -124,7 +123,7 @@ const AdminUserManagement = () => {
 
   async function handleDeleteUser(userId) {
     try {
-      const response = await axiosInstance.delete(
+      const response = await axios.delete(
         `${url}/user/users/${userId}`
       );
 
