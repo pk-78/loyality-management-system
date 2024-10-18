@@ -39,8 +39,9 @@ const PatientSearchAndManagement = ({ isUser }) => {
     // Filter the results
     const filteredResults = patients.filter(
       (patient) =>
-        patient.UHID.includes(query) ||
-        patient.name.toLowerCase().includes(query.toLowerCase())
+        patient.UHID?.includes(query) ||
+        (patient.name &&
+          patient.name.toLowerCase().includes(query.toLowerCase()))
     );
 
     // Use a Set to avoid duplicate UHID entries (you can also use other unique fields)
