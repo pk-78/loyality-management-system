@@ -11,10 +11,10 @@ export const registerPatient = async (req, res) => {
     }
 
     // Check if Loyalty Card already exists
-    const existingLoyaltyCard = await Patient.findOne({ LoyalityCard });
-    if (existingLoyaltyCard) {
-      return res.status(400).json({ message: "Loyalty Card already exists" });
-    }
+    // const existingLoyaltyCard = await Patient.findOne({ LoyalityCard });
+    // if (existingLoyaltyCard) {
+    //   return res.status(400).json({ message: "Loyalty Card already exists" });
+    // }
 
     // Create new patient
     const newPatient = new Patient({
@@ -74,7 +74,8 @@ export const getPatientByUHID = async (req, res) => {
 export const handleTransaction = async (req, res) => {
   try {
     const { UHID } = req.params;
-    const { points, transactionType, desk, remarks,transactionUsername } = req.body;
+    const { points, transactionType, desk, remarks, transactionUsername } =
+      req.body;
 
     // Find the patient by UHID
     const patient = await Patient.findOne({ UHID });
@@ -106,6 +107,7 @@ export const handleTransaction = async (req, res) => {
     res.json({ patient }); // Respond with updated patient data
   } catch (error) {
     console.error("Error processing transaction:", error);
+    console.log("Error processing transaction:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
