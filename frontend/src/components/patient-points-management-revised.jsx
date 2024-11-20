@@ -73,8 +73,8 @@ const PatientPointsManagement = ({ isUsername }) => {
 
   const [transactions, setTransactions] = useState([]);
 
-  async function OnSubmit(data) {
-    const pointsInt = parseInt(data.points, 10);
+  async function OnSubmit(data) {   
+    const pointsInt = parseInt(data.points, 10);   
     setButtonLoading(true);
     try {
       const response = await axios.post(
